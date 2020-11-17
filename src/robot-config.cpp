@@ -8,17 +8,17 @@ using code = vision::code;
 brain  Brain;
 
 // VEXcode device constructors
-motor FrontRight = motor(PORT1, ratio18_1, true);
-motor BackRight = motor(PORT2, ratio18_1, true);
-motor BackLeft = motor(PORT3, ratio18_1, false);
-motor FrontLeft = motor(PORT4, ratio18_1, false);
+motor FrontRight = motor(PORT13, ratio18_1, false);
+motor BackRight = motor(PORT9, ratio18_1, false);
+motor BackLeft = motor(PORT20, ratio18_1, false);
+motor FrontLeft = motor(PORT2, ratio18_1, false);
 
-motor MainConveyor = motor(PORT4, ratio6_1, false);
-motor Indexer = motor(PORT5, ratio6_1, false);
-motor Expeller = motor(PORT6, ratio6_1, false);
+motor MainConveyor = motor(PORT3, ratio6_1, true);
+motor Indexer = motor(PORT4, ratio6_1, true);
+motor Expeller = motor(PORT10, ratio6_1, false);
 
-motor LeftIntake = motor(PORT6, ratio18_1, false);
-motor RightIntake = motor(PORT6, ratio18_1, true);
+motor LeftIntake = motor(PORT1, ratio18_1, false);
+motor RightIntake = motor(PORT19, ratio18_1, true);
 
 controller Controller1 = controller(primary);
 
@@ -35,7 +35,7 @@ int rc_auto_loop_function_Controller1() {
       // left = Axis3
       // right = Axis2
       int RightY = Controller1.Axis2.position();
-      int RightX = Controller1.Axis1.position();
+      int RightX = Controller1.Axis1.position()*0.6;
       int LeftY = Controller1.Axis4.position();
 
       bool leftBumper = Controller1.ButtonL1.pressing();
@@ -50,9 +50,9 @@ int rc_auto_loop_function_Controller1() {
       if(abs(LeftY) < DEADBAND){ LeftY = 0; }
 
       FrontLeft.spin(forward, RightY+RightX+LeftY, percentUnits::pct);
-      BackLeft.spin(forward, -RightY-RightX+LeftY, percentUnits::pct);
+      BackLeft.spin(forward, RightY+RightX-LeftY, percentUnits::pct);
       FrontRight.spin(forward, -RightY+RightX+LeftY, percentUnits::pct);
-      BackRight.spin(forward, RightY-RightX+LeftY, percentUnits::pct);
+      BackRight.spin(forward, -RightY+RightX-LeftY, percentUnits::pct);
 
 
       if(leftBumper){
@@ -62,9 +62,9 @@ int rc_auto_loop_function_Controller1() {
         Expeller.spin(forward, 100, percentUnits::pct);
         Indexer.stop(brakeType::coast);
       }else if (leftTrigger) {
-        LeftIntake.spin(reverse, 25, percentUnits::pct);
-        RightIntake.spin(reverse, 25, percentUnits::pct);
-        MainConveyor.stop(brakeType::coast);
+        LeftIntake.spin(reverse, 35, percentUnits::pct);
+        RightIntake.spin(reverse, 35, percentUnits::pct);
+        MainConveyor.spin(reverse, 100, percentUnits::pct);
         Expeller.stop(brakeType::coast);
         Indexer.stop(brakeType::coast);
       }else if(rightBumper){
